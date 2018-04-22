@@ -1,0 +1,4 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<hudson.maven.MavenModuleSetBuild plugin="maven-plugin@3.1.2">
+  <result>SUCCESS</result>
+</hudson.maven.MavenModuleSetBuild>
