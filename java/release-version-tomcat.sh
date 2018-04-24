@@ -44,15 +44,17 @@ function restart_service {
     rsync -av ${src_package}/* ${user}@${remote_ip}:${remote_tomcat_project_path} --delete-after
     ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"startup-tomcat.sh" ${service_name} ${remote_path}"
     source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
-    if [[ ${service_status} == "error" ]];then
-        rm ${lock_file}
-        if [[ ${backup} == "yes" ]];then
-            # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
-            source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "tomcat" "${remote_ip}"
-            echo 本次版本发布异常，已回退至版本: ${rollback_version}
-        else
-           echo "本次发布异常，请确认!"
-           exit 1
+    if [[ ${service_status} == "" ]];then
+        if [[ ${service_status} == "error" ]];then
+            rm ${lock_file}
+            if [[ ${backup} == "yes" ]];then
+                # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
+                source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "tomcat" "${remote_ip}"
+                echo 本次版本发布异常，已回退至版本: ${rollback_version}
+            else
+               echo "本次发布异常，请确认!"
+               exit 1
+            fi
         fi
     fi
 }

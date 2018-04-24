@@ -38,16 +38,18 @@ function restart_service {
     ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"shutdown-springboot.sh" ${service_name}"
     rsync -av ${src_package} ${user}@${remote_ip}:${remote_springboot_project_path}
     ssh ${user}@${remote_ip} "bash /etc/init.d/springboot restart ${service_name}"
-    source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
-    if [[ ${service_status} == "error" ]];then
-        rm ${lock_file}
-        if [[ ${backup} == "yes" ]];then
-            # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
-            source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "springboot" "${remote_ip}"
-            echo 本次版本发布异常，已回退至版本: ${rollback_version}
-        else
-           echo "本次发布异常，请确认!"
-           exit 1
+    if [[ ${service_status} == "" ]];then
+        source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
+        if [[ ${service_status} == "error" ]];then
+            rm ${lock_file}
+            if [[ ${backup} == "yes" ]];then
+                # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
+                source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "springboot" "${remote_ip}"
+                echo 本次版本发布异常，已回退至版本: ${rollback_version}
+            else
+               echo "本次发布异常，请确认!"
+               exit 1
+            fi
         fi
     fi
 }
