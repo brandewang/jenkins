@@ -48,6 +48,7 @@ function restart_service {
                 echo 本次版本发布异常，已回退至版本: ${rollback_version}
             else
                echo "本次发布异常，请确认!"
+               echo ${url} ${http_code}
                exit 1
             fi
         fi
