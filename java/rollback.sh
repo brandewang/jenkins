@@ -10,7 +10,6 @@ fi
 service_container=$1
 remote_ips=$2
 to_rollback="rollback"
-project_backup_path='/data/j_code_back/tms/tms-wx/'
 
 # 获取最新的备份目录
 if [[ ${remote_ips} != "" ]];then

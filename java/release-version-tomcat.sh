@@ -46,9 +46,14 @@ function restart_service {
     source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
     if [[ ${service_status} == "error" ]];then
         rm ${lock_file}
-        # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
-        source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "tomcat" "${remote_ip}"
-        echo 本次版本发布异常，已回退至版本: ${rollback_version}
+        if [[ ${backup} == "yes" ]];then
+            # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
+            source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "tomcat" "${remote_ip}"
+            echo 本次版本发布异常，已回退至版本: ${rollback_version}
+        else
+           echo "本次发布异常，请确认!"
+           exit 1
+        fi
     fi
 }
 

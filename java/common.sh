@@ -17,7 +17,7 @@ fi
 namespace=$(echo ${JOB_NAME} | awk -F '/' '{print $1}')
 lock_path=${JENKINS_JAVA_SHELL_PATH}"/lock/${namespace}/"
 if [[ ! -d ${lock_path} ]];then
-    mkdir ${lock_path}
+    mkdir -p ${lock_path}
 fi
 project=$(echo ${JOB_NAME} | awk -F '/' '{print $NF}')
 # 配置文件目录
@@ -27,15 +27,19 @@ if [[ ${CHOICE_SUBITEM} == "" ]];then
     project_backup_path=${CODE_BACK_PATH}${project}
     remote_tomcat_project_path=${REMOTE_TOMCAT_PATH}"tomcat-"${project}/webapps/ROOT/
     service_name=${project}
-    ips=`python ${JENKINS_JAVA_SHELL_PATH}/get-pool-info.py ${hosts} ${project}`
+    remote_ips=`python ${JENKINS_JAVA_SHELL_PATH}/get-pool-info.py ${hosts} ${project}`
     lock_file=${lock_path}${project}
 else 
     project_config_path=${config_path}${project}/${CHOICE_SUBITEM}
     project_path=${JENKINS_HOME}/workspace/${JOB_NAME}/${CHOICE_SUBITEM}
     project_backup_path=${CODE_BACK_PATH}${JOB_NAME}/${CHOICE_SUBITEM}
-    remote_tomcat_project_path=${REMOTE_TOMCAT_PATH}"tomcat-"${CHOICE_SUBITEM}/webapps/ROOT/
+    if [[ ${CHOICE_SUBITEM} == "hr-wx" ]];then
+        remote_tomcat_project_path=${REMOTE_TOMCAT_PATH}"tomcat-"${CHOICE_SUBITEM}/webapps/${CHOICE_SUBITEM}/
+    else
+        remote_tomcat_project_path=${REMOTE_TOMCAT_PATH}"tomcat-"${CHOICE_SUBITEM}/webapps/ROOT/
+    fi
     service_name=${CHOICE_SUBITEM}
-    ips=`python ${JENKINS_JAVA_SHELL_PATH}/get-pool-info.py ${hosts} ${CHOICE_SUBITEM}`
+    remote_ips=`python ${JENKINS_JAVA_SHELL_PATH}/get-pool-info.py ${hosts} ${CHOICE_SUBITEM}`
     lock_file=${lock_path}${project}${CHOICE_SUBITEM}
 fi
 
@@ -58,4 +62,4 @@ if [[ ${CHECK_URI} == "" ]];then
 else
     check_uri=${CHECK_URI}
 fi
-check_time=60
+check_time=120
