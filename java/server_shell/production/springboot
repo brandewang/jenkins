@@ -7,10 +7,16 @@ if [[ -z $2 ]];then
 fi
 
 application_name=$2
+package_suffix=$3
+if [[ -z $4 ]];then
+    usage_mem="512"
+else
+    usage_mem=$4
+fi
 pid_path='/data/jar/run/pid/'
 pid_file=${pid_path}${application_name}.pid
 application_path='/data/jar/'
-application=${application_path}${application_name}.jar
+application=${application_path}${application_name}.${package_suffix}
 lock_path='/data/jar/run/lock/'
 lockfile=${lock_path}${application_name}
 log_path='/data/logs/all-tomcat-logs/'${application_name}''
@@ -37,7 +43,7 @@ start() {
             else
                 echo ${log_path} 不存在
             fi
-            nohup java -jar -Dspring.cloud.config.profile=production ${application} >> ${log_file} 2>&1 & echo $! > ${pid_file}
+            nohup java -jar -Dspring.cloud.config.profile=production  -Xms${usage_mem}m -Xmx${usage_mem}m ${application} >> ${log_file} 2>&1 & echo $! > ${pid_file}
         else
             echo ${application_name} is starting
         fi

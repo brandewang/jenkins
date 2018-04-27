@@ -5,10 +5,11 @@ if [[ -z $2 ]];then
 fi
 
 application_name=$2
+package_suffix=$3
 pid_path='/data/jar/run/pid/'
 pid_file=${pid_path}${application_name}.pid
 application_path='/data/jar/'
-application=${application_path}${application_name}.jar
+application=${application_path}${application_name}.${package_suffix}
 lock_path='/data/jar/run/lock/'
 lockfile=${lock_path}${application_name}
 log_path='/data/logs/all-tomcat-logs/'${application_name}''

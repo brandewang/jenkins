@@ -1,0 +1,15 @@
+# 同步静态资源文件到远程服务器
+- hosts: '{{ hosts }}'
+  remote_user: root
+  tasks:
+    # 创建远程服务器目录
+    - name: ensure {{ dest }} created
+      file: path={{ dest }} state=directory owner={{ owner }} group={{ group }} mode=0755 recurse=yes
+    
+- hosts: '{{ hosts }}'
+  remote_user: '{{ owner }}'
+  tasks:
+    - synchronize:
+          src: '{{ src }}'
+          dest: '{{ dest }}'
+#          delete: yes

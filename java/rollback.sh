@@ -15,7 +15,7 @@ to_rollback="rollback"
 if [[ ${remote_ips} != "" ]];then
     # 获取最近时间的一个版本号
     rollback_version=$(ls -tr ${project_backup_path} | tail -n 1)
-    rollback_path=${project_backup_path}${rollback_version}
+    rollback_path=${project_backup_path}/${rollback_version}
 fi
 
 # 保险起见，判断备份目录存在并且不为空

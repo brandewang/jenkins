@@ -43,11 +43,14 @@ function restart_service {
     ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"shutdown-tomcat.sh" ${service_name}"
     rsync -av ${src_package}/* ${user}@${remote_ip}:${remote_tomcat_project_path} --delete-after
     ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"startup-tomcat.sh" ${service_name} ${remote_path}"
-    source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
     if [[ ${service_status} == "" ]];then
+        source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
         if [[ ${service_status} == "error" ]];then
             rm ${lock_file}
             if [[ ${backup} == "yes" ]];then
+                if [[ -d ${backup_path} ]];then
+                    rm -rf ${backup_path}
+                fi
                 # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
                 source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "tomcat" "${remote_ip}"
                 echo 本次版本发布异常，已回退至版本: ${rollback_version}

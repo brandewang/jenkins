@@ -63,3 +63,16 @@ else
     check_uri=${CHECK_URI}
 fi
 check_time=120
+
+# springboot 项目
+if [[ ${USAGE_MEM} == "" ]];then
+    usage_mem="512"
+else
+    if [[ ${USAGE_MEM} -gt 0 ]] 2>/dev/null;then
+        usage_mem=${USAGE_MEM}
+    else
+        echo ${USAGE_MEM} is not int !
+        exit
+    fi
+fi
+

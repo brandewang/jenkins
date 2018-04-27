@@ -37,12 +37,15 @@ function project_backup {
 function restart_service {
     ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"shutdown-springboot.sh" ${service_name}"
     rsync -av ${src_package} ${user}@${remote_ip}:${remote_springboot_project_path}
-    ssh ${user}@${remote_ip} "bash /etc/init.d/springboot restart ${service_name}"
+    ssh ${user}@${remote_ip} "bash /etc/init.d/springboot restart ${service_name} ${CHOICE_PACKAGE_SUFFIX} ${usage_mem}"
     if [[ ${service_status} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
         if [[ ${service_status} == "error" ]];then
             rm ${lock_file}
             if [[ ${backup} == "yes" ]];then
+                if [[ -d ${backup_path} ]];then
+                    rm -rf ${backup_path}
+                fi
                 # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
                 source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "springboot" "${remote_ip}"
                 echo 本次版本发布异常，已回退至版本: ${rollback_version}
@@ -54,12 +57,6 @@ function restart_service {
         fi
     fi
 }
-
-# 验证
-check_package_springboot
-
-# 归档代码
-project_backup
 
 if [[ ${to_rollback} == "" ]];then
     # 检测本次编译后，是否有超出预期效果的情况
