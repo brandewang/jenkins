@@ -20,6 +20,11 @@ if [[ ! -d ${lock_path} ]];then
     mkdir -p ${lock_path}
 fi
 project=$(echo ${JOB_NAME} | awk -F '/' '{print $NF}')
+if [[ -z ${PACKAGE_SUFFIX} ]];then
+    package_suffix="jar"
+else
+    package_suffix=${PACKAGE_SUFFIX}
+fi
 # 配置文件目录
 if [[ ${CHOICE_SUBITEM} == "" ]];then
     project_config_path=${config_path}${project}
@@ -27,6 +32,7 @@ if [[ ${CHOICE_SUBITEM} == "" ]];then
     project_backup_path=${CODE_BACK_PATH}${project}
     remote_tomcat_project_path=${REMOTE_TOMCAT_PATH}"tomcat-"${project}/webapps/ROOT/
     service_name=${project}
+    package_name=${project}"."${package_suffix}
     remote_ips=`python ${JENKINS_JAVA_SHELL_PATH}/get-pool-info.py ${hosts} ${project}`
     lock_file=${lock_path}${project}
 else 
@@ -39,12 +45,15 @@ else
         remote_tomcat_project_path=${REMOTE_TOMCAT_PATH}"tomcat-"${CHOICE_SUBITEM}/webapps/ROOT/
     fi
     service_name=${CHOICE_SUBITEM}
+    package_name=${service_name}"."${package_suffix}
     remote_ips=`python ${JENKINS_JAVA_SHELL_PATH}/get-pool-info.py ${hosts} ${CHOICE_SUBITEM}`
     lock_file=${lock_path}${project}${CHOICE_SUBITEM}
 fi
 
-rollback_version=$(echo ${ROLLBACK_VERSION}|awk -F '/' '{print $(NF-1)}')
-rollback_path=${project_backup_path}/${rollback_version}
+if [[ ! -z ${ROLLBACK_VERSION} ]];then
+    rollback_version=$(echo ${ROLLBACK_VERSION}|awk -F '/' '{print $(NF-1)}')
+    rollback_path=${project_backup_path}/${rollback_version}
+fi
 remote_springboot_project_path=${REMOTE_SPRINGBOOT_PATH}
 backup_path=${project_backup_path}/${BUILD_NUMBER}/
 # 项目路径
@@ -57,7 +66,7 @@ fi
 # 需要覆盖的配置文件目录
 resources_path=${project_path}/src/main/resources/
 scheme="http://"
-if [[ ${CHECK_URI} == "" ]];then
+if [[ -z ${CHECK_URI} ]];then
     check_uri="/index.jsp"
 else
     check_uri=${CHECK_URI}
@@ -65,7 +74,7 @@ fi
 check_time=120
 
 # springboot 项目
-if [[ ${USAGE_MEM} == "" ]];then
+if [[ -z ${USAGE_MEM} ]];then
     usage_mem="512"
 else
     if [[ ${USAGE_MEM} -gt 0 ]] 2>/dev/null;then

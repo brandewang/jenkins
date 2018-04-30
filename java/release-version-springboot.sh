@@ -18,7 +18,7 @@ fi
 
 function check_package_springboot {
     cd ${project_path}
-    package=$(find . -name ${project}"."${CHOICE_PACKAGE_SUFFIX})
+    package=$(find . -name ${package_name})
     package_num=$(echo ${package} |wc -l)
     if [[ ${package_num} -ne 1 ]];then
         echo "package num is error! ${package}"
@@ -37,18 +37,20 @@ function project_backup {
 function restart_service {
     ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"shutdown-springboot.sh" ${service_name}"
     rsync -av ${src_package} ${user}@${remote_ip}:${remote_springboot_project_path}
-    ssh ${user}@${remote_ip} "bash /etc/init.d/springboot restart ${service_name} ${CHOICE_PACKAGE_SUFFIX} ${usage_mem}"
+    ssh ${user}@${remote_ip} "bash /etc/init.d/springboot restart ${service_name} ${package_suffix} ${usage_mem}"
     if [[ ${service_status} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
-        if [[ ${service_status} == "error" ]];then
+        if [[ ${service_status} == "error" || ${service_status} == "noport" ]];then
             rm ${lock_file}
             if [[ ${backup} == "yes" ]];then
                 if [[ -d ${backup_path} ]];then
                     rm -rf ${backup_path}
                 fi
-                # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
-                source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "springboot" "${remote_ip}"
-                echo 本次版本发布异常，已回退至版本: ${rollback_version}
+                if [[ ${service_status} == "error" ]];then
+                    # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
+                    source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "springboot" "${remote_ip}"
+                    echo 本次版本发布异常，已回退至版本: ${rollback_version}
+                fi
             else
                echo "本次发布异常，请确认!"
                echo ${url} ${http_code}
