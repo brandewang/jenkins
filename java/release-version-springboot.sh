@@ -30,13 +30,13 @@ function check_package_springboot {
 function project_backup {
     if [[ ${backup} == "yes" ]];then
         mkdir -p ${backup_path}
-        rsync -av ${package} ${backup_path}
+        rsync -a ${package} ${backup_path}
     fi
 }
 
 function restart_service {
     ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"shutdown-springboot.sh" ${service_name}"
-    rsync -av ${src_package} ${user}@${remote_ip}:${remote_springboot_project_path}
+    rsync -a ${src_package} ${user}@${remote_ip}:${remote_springboot_project_path}
     ssh ${user}@${remote_ip} "bash /etc/init.d/springboot restart ${service_name} ${package_suffix} ${usage_mem}"
     if [[ ${service_status} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh

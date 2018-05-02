@@ -35,13 +35,13 @@ function project_backup {
         fi
         
         mkdir -p ${backup_path}
-        rsync -av ${package}/* ${backup_path}
+        rsync -a ${package}/* ${backup_path}
     fi
 }
 
 function restart_service {
     ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"shutdown-tomcat.sh" ${service_name}"
-    rsync -av ${src_package}/* ${user}@${remote_ip}:${remote_tomcat_project_path} --delete-after
+    rsync -a ${src_package}/* ${user}@${remote_ip}:${remote_tomcat_project_path} --delete-after
     ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"startup-tomcat.sh" ${service_name} ${remote_path}"
     if [[ ${service_status} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
