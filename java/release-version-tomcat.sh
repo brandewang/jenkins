@@ -8,13 +8,13 @@ remote_path=${REMOTE_TOMCAT_PATH}
 if [[ ! -z $2 ]];then
     remote_ips=$2
 fi
-# 判断是否有人在使用
-if [ -f ${lock_file} ];then
-    echo "Version is releasing,Please wait a moment! "
-    exit 1
-else
-    touch ${lock_file}
-fi
+## 判断是否有人在使用
+#if [ -f ${lock_file} ];then
+#    echo "Version is releasing,Please wait a moment! "
+#    exit 1
+#else
+#    touch ${lock_file}
+#fi
 
 function check_package_tomcat {
     cd ${project_path}
@@ -22,7 +22,7 @@ function check_package_tomcat {
     package_num=$(echo ${package} |wc -l)
     if [[ ${package_num} -ne 1 ]];then
         echo "package num is error! ${package}"
-        rm ${lock_file}
+#        rm ${lock_file}
         exit 1
     fi
 }
@@ -46,7 +46,7 @@ function restart_service {
     if [[ ${service_status} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
         if [[ ${service_status} == "error" ]];then
-            rm ${lock_file}
+#            rm ${lock_file}
             if [[ ${backup} == "yes" ]];then
                 if [[ -d ${backup_path} ]];then
                     rm -rf ${backup_path}
@@ -79,4 +79,4 @@ do
     restart_service
 done
 
-rm ${lock_file}
+#rm ${lock_file}
