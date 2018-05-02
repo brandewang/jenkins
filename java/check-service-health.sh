@@ -25,7 +25,7 @@ function check_service_status(){
 http_port=$(ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}${shell_name} ${service_name} ${remote_path}")
 if [[ -z ${http_port} ]];then
     echo "端口未获取到，请联系管理员！"
-    service_status="noport"
+    service_status="error"
 else
     check_port_status
     i=1

@@ -45,17 +45,16 @@ function restart_service {
     ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"startup-tomcat.sh" ${service_name} ${remote_path}"
     if [[ ${service_status} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
-        if [[ ${service_status} == "error" || ${service_status} == "noport" ]];then
+        if [[ ${service_status} == "error" ]];then
             rm ${lock_file}
             if [[ ${backup} == "yes" ]];then
                 if [[ -d ${backup_path} ]];then
                     rm -rf ${backup_path}
                 fi
-                if [[ ${service_status} == "error" ]];then
-                    # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
-                    source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "tomcat" "${remote_ip}"
-                    echo 本次版本发布异常，已回退至版本: ${rollback_version}
-                fi
+                # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
+                source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "tomcat" "${remote_ip}"
+                echo 本次版本发布异常，已回退至版本: ${rollback_version}
+                exit 1
             else
                echo "本次发布异常，请确认!"
                echo ${url} ${http_code}
