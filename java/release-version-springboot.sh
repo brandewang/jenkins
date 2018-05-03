@@ -38,7 +38,7 @@ function restart_service {
     ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"shutdown-springboot.sh" ${service_name}"
     rsync -a ${src_package} ${user}@${remote_ip}:${remote_springboot_project_path}
     ssh ${user}@${remote_ip} "bash /etc/init.d/springboot restart ${service_name} ${package_suffix} ${usage_mem}"
-    if [[ ${service_status} == "" ]];then
+    if [[ ${service_status} == "" && ${to_rollback} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
         if [[ ${service_status} == "error" ]];then
 #            rm ${lock_file}
@@ -63,6 +63,10 @@ if [[ ${to_rollback} == "" ]];then
     # 检测本次编译后，是否有超出预期效果的情况
     check_package_springboot
     src_package=${package}
+    if [[ -z ${src_package} ]];then
+        echo "src_package not found!";
+        exit 1
+    fi
     # 归档代码
     project_backup
 else
@@ -74,4 +78,11 @@ do
     restart_service
 done
 
+# 回退
+if [[ ${to_rollback} != "" ]];then
+    echo '回退成功，本次构建结束！'
+    echo 'jenkins报错不用管！'
+    exit 1
+fi
 #rm ${lock_file}
+

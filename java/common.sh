@@ -29,7 +29,7 @@ fi
 if [[ ${CHOICE_SUBITEM} == "" ]];then
     project_config_path=${config_path}${project}
     project_path=${JENKINS_HOME}/workspace/${JOB_NAME}
-    project_backup_path=${CODE_BACK_PATH}${project}
+    project_backup_path=${CODE_BACK_PATH}${JOB_NAME}
     remote_tomcat_project_path=${REMOTE_TOMCAT_PATH}"tomcat-"${project}/webapps/ROOT/
     service_name=${project}
     package_name=${project}"."${package_suffix}
