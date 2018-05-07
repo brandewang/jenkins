@@ -13,7 +13,7 @@ function check_port_status(){
 
 function check_service_status(){
     url=${scheme}${remote_ip}":"${http_port}${check_uri}
-    http_code=$(curl -I -k --connect-timeout ${check_time} -m ${check_time} -o /dev/null -s -w %{http_code} "${url}")
+    http_code=$(curl -I --connect-timeout ${check_time} -m ${check_time} -o /dev/null -s -w %{http_code} "${url}")
     if [[ $? -ne 0 || ${http_code} == "404" ]];then
         service_status="error" 
     else

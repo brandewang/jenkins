@@ -60,6 +60,7 @@ function restart_service {
 }
 
 if [[ ${to_rollback} == "" ]];then
+    desc=${GIT_COMMIT}
     # 检测本次编译后，是否有超出预期效果的情况
     check_package_springboot
     src_package=${package}
@@ -70,8 +71,12 @@ if [[ ${to_rollback} == "" ]];then
     # 归档代码
     project_backup
 else
+    desc="rollback to "${rollback_version}
     src_package=${rollback_path}
 fi
+
+# jenkins打标签
+curl -n -X POST -d "description=${desc}" "${BUILD_URL}/submitDescription"
 
 for remote_ip in ${remote_ips}
 do
