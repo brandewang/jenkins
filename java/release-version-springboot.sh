@@ -4,7 +4,7 @@ set -x
 source ${JENKINS_JAVA_SHELL_PATH}/common.sh
 
 shell_name='get-springboot-http-port.sh'
-remote_path=${REMOTE_JAVA_LOGS}
+remote_path=${remote_java_logs}
 if [[ ! -z $2 ]];then
     remote_ips=$2
 fi
@@ -35,7 +35,7 @@ function project_backup {
 }
 
 function restart_service {
-    ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"shutdown-springboot.sh" ${service_name}"
+    ssh ${user}@${remote_ip} "bash ${remote_shell_path}"shutdown-springboot.sh" ${service_name}"
     rsync -a ${src_package} ${user}@${remote_ip}:${remote_springboot_project_path}
     ssh ${user}@${remote_ip} "bash /etc/init.d/springboot restart ${service_name} ${package_suffix} ${usage_mem}"
     if [[ ${service_status} == "" && ${to_rollback} == "" ]];then

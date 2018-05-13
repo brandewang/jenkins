@@ -22,7 +22,7 @@ function check_service_status(){
 }
 
 # 获取启动端口
-http_port=$(ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}${shell_name} ${service_name} ${remote_path}")
+http_port=$(ssh ${user}@${remote_ip} "bash ${remote_shell_path}${shell_name} ${service_name} ${remote_path}")
 if [[ -z ${http_port} ]];then
     echo "端口未获取到，请联系管理员！"
     service_status="error"

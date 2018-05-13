@@ -1,11 +1,11 @@
 #!/bin/bash
 # 公共资源
 if [[ ${JOB_NAME} =~ ^pro- ]];then
-    hosts_file=${PRO_ANSIBLE_FILE}
     user="ec2-user"
+    hosts_file=${JENKINS_HOME}/ansible/hosts
 else
-    hosts_file=${PG_ANSIBLE_FILE}
     user="www"
+    hosts_file=${JENKINS_HOME}/ansible/pg-hsts
 fi
 
 hosts='static'
@@ -18,4 +18,4 @@ else
     src_path=`pwd`"/"${SRC_PATH}
 fi
 # 同步到远程目录
-dest_path=${REMOTE_STATIC_PATH}${project}
+dest_path="/data/static/"${project}

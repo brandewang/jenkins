@@ -1,21 +1,20 @@
-#!/bin/bash
-# 公共资源
+#!/bin/bash # 公共资源
 if [[ ${JOB_NAME} =~ ^pro- ]];then
-    project=${JOB_NAME}
-    user=${PRO_USER}
-    hosts=${PRO_ANSIBLE_FILE}
-    config_path=${PRO_CONFIG_PATH}
-    # 需要归档
+    user="ec2-user"
+    hosts_file=${JENKINS_HOME}/ansible/hosts
+    config_path=${JENKINS_HOME}/workspace/ops-common/pro-config/
     backup='yes'
 else
-    user=${PG_USER}
-    hosts=${PG_ANSIBLE_FILE}
-    config_path=${PG_CONFIG_PATH}
-    # 不需要归档
+    user="www"
+    hosts_file=${JENKINS_HOME}/ansible/pg-hosts
+    config_path=${JENKINS_HOME}/workspace/ops-common/pg-config/
     backup='no'
 fi
-namespace=$(echo ${JOB_NAME} | awk -F '/' '{print $1}')
-lock_path=${JENKINS_JAVA_SHELL_PATH}"/lock/${namespace}/"
+remote_shell_path="/home/www/publish-shell/"
+remote_springboot_project_path="/data/jar/"
+remote_tomcat_path="/data/tomcat/"
+remote_java_logs="/data/logs/all-tomcat-logs/"
+lock_path=${JENKINS_JAVA_SHELL_PATH}"/lock/${JOB_NAME}/"
 if [[ ! -d ${lock_path} ]];then
     mkdir -p ${lock_path}
 fi
@@ -29,24 +28,24 @@ fi
 if [[ ${CHOICE_SUBITEM} == "" ]];then
     project_config_path=${config_path}${project}
     project_path=${JENKINS_HOME}/workspace/${JOB_NAME}
-    project_backup_path=${CODE_BACK_PATH}${JOB_NAME}
-    remote_tomcat_project_path=${REMOTE_TOMCAT_PATH}"tomcat-"${project}/webapps/ROOT/
+    project_backup_path=${JENKINS_HOME}/code_backup/${JOB_NAME}
+    remote_tomcat_project_path=${remote_tomcat_path}"tomcat-"${project}/webapps/ROOT/
     service_name=${project}
     package_name=${project}"."${package_suffix}
-    remote_ips=`python ${JENKINS_JAVA_SHELL_PATH}/get-pool-info.py ${hosts} ${project}`
+    remote_ips=`python ${JENKINS_JAVA_SHELL_PATH}/get-pool-info.py ${hosts_file} ${project}`
     lock_file=${lock_path}${project}
 else 
     project_config_path=${config_path}${project}/${CHOICE_SUBITEM}
     project_path=${JENKINS_HOME}/workspace/${JOB_NAME}/${CHOICE_SUBITEM}
-    project_backup_path=${CODE_BACK_PATH}${JOB_NAME}/${CHOICE_SUBITEM}
+    project_backup_path=${JENKINS_HOME}/code_backup/${JOB_NAME}/${CHOICE_SUBITEM}
     if [[ ${CHOICE_SUBITEM} == "hr-wx" ]];then
-        remote_tomcat_project_path=${REMOTE_TOMCAT_PATH}"tomcat-"${CHOICE_SUBITEM}/webapps/${CHOICE_SUBITEM}/
+        remote_tomcat_project_path=${remote_tomcat_path}"tomcat-"${CHOICE_SUBITEM}/webapps/${CHOICE_SUBITEM}/
     else
-        remote_tomcat_project_path=${REMOTE_TOMCAT_PATH}"tomcat-"${CHOICE_SUBITEM}/webapps/ROOT/
+        remote_tomcat_project_path=${remote_tomcat_path}"tomcat-"${CHOICE_SUBITEM}/webapps/ROOT/
     fi
     service_name=${CHOICE_SUBITEM}
     package_name=${service_name}"."${package_suffix}
-    remote_ips=`python ${JENKINS_JAVA_SHELL_PATH}/get-pool-info.py ${hosts} ${CHOICE_SUBITEM}`
+    remote_ips=`python ${JENKINS_JAVA_SHELL_PATH}/get-pool-info.py ${hosts_file} ${CHOICE_SUBITEM}`
     lock_file=${lock_path}${project}${CHOICE_SUBITEM}
 fi
 
@@ -54,7 +53,6 @@ if [[ ! -z ${ROLLBACK_VERSION} ]];then
     rollback_version=$(echo ${ROLLBACK_VERSION}|awk -F '/' '{print $(NF-1)}')
     rollback_path=${project_backup_path}/${rollback_version}
 fi
-remote_springboot_project_path=${REMOTE_SPRINGBOOT_PATH}
 backup_path=${project_backup_path}/${BUILD_NUMBER}/
 # 项目路径
 cd ${project_path}
@@ -84,4 +82,6 @@ else
         exit
     fi
 fi
+
+
 

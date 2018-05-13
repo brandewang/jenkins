@@ -4,7 +4,7 @@ set -x
 source ${JENKINS_JAVA_SHELL_PATH}/common.sh
 
 shell_name='get-tomcat-http-port.sh'
-remote_path=${REMOTE_TOMCAT_PATH}
+remote_path=${remote_tomcat_path}
 if [[ ! -z $2 ]];then
     remote_ips=$2
 fi
@@ -27,22 +27,24 @@ function check_package_tomcat {
     fi
 }
 
+function cp_libsap {
+    if [[ ${LIBSAP} == "true" ]];then
+        cp ${JENKINS_JAVA_SHELL_PATH}/so/libsapjco3.so ${package}/WEB-INF/lib/
+    fi
+}
+
 function project_backup {
     if [[ ${backup} == "yes" ]];then
         # libsapjco3.so 用途为调用SAP，部分项目会使用
-        if [[ ${LIBSAP} == "true" ]];then
-            cp ${JENKINS_JAVA_SHELL_PATH}/so/libsapjco3.so ${package}/WEB-INF/lib/
-        fi
-        
         mkdir -p ${backup_path}
         rsync -a ${package}/* ${backup_path}
     fi
 }
 
 function restart_service {
-    ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"shutdown-tomcat.sh" ${service_name}"
+    ssh ${user}@${remote_ip} "bash ${remote_shell_path}"shutdown-tomcat.sh" ${service_name}"
     rsync -a ${src_package}/* ${user}@${remote_ip}:${remote_tomcat_project_path} --delete-after
-    ssh ${user}@${remote_ip} "bash ${REMOTE_SHELL_PATH}"startup-tomcat.sh" ${service_name} ${remote_path}"
+    ssh ${user}@${remote_ip} "bash ${remote_shell_path}"startup-tomcat.sh" ${service_name} ${remote_path}"
     if [[ ${service_status} == "" && ${to_rollback} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
         if [[ ${service_status} == "error" ]];then
@@ -73,6 +75,7 @@ if [[ ${to_rollback} == "" ]];then
         echo "src_package not found!";
         exit 1
     fi
+    cp_libsap
     # 归档代码
     project_backup
 else

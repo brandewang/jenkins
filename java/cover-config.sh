@@ -15,7 +15,7 @@ if [[ -d ${project_config_path} ]];then
         if [[ $? -ne 0 ]];then
             exit 1
         fi
-    fi
+    fi 
 fi
 
 cd ${resources_path}
