@@ -28,6 +28,7 @@ function check_package_tomcat {
 }
 
 function cp_libsap {
+    # libsapjco3.so 用途为调用SAP，部分项目会使用
     if [[ ${LIBSAP} == "true" ]];then
         cp ${JENKINS_JAVA_SHELL_PATH}/so/libsapjco3.so ${package}/WEB-INF/lib/
     fi
@@ -35,7 +36,6 @@ function cp_libsap {
 
 function project_backup {
     if [[ ${backup} == "yes" ]];then
-        # libsapjco3.so 用途为调用SAP，部分项目会使用
         mkdir -p ${backup_path}
         rsync -a ${package}/* ${backup_path}
     fi

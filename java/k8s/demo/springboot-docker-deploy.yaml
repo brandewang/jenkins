@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {APPNAME}
+  namespace: {NAMESPACE}
+  labels:
+    app: {APPNAME}
+spec:
+  selector:
+    app: {APPNAME}
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {APPNAME}
+  namespace: {NAMESPACE}
+  labels:
+    app: {APPNAME}
+spec:
+  replicas: {NUM}
+  strategy:
+    rollingUpdate:
+      maxSurge: 10%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: {APPNAME}
+  template:
+    metadata:
+      labels:
+        app: {APPNAME}
+    spec:
+      containers:
+      - name: {APPNAME}
+        image: {IMAGE_NAME}
+        resources:
+          limits:
+            cpu: {LIMITS_CPU}m
+            memory: {LIMITS_MEM}Mi
+          requests:
+            cpu: {REQUESTS_CPU}m
+            memory: {REQUESTS_MEM}Mi
+        livenessProbe:
+          httpGet:
+            path: {CHECK_URI}
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: {CHECK_URI}
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 10
+          timeoutSeconds: 60
+        env:
+        - name: env
+          value: "test"

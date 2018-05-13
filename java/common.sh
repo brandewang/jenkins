@@ -28,7 +28,7 @@ fi
 if [[ ${CHOICE_SUBITEM} == "" ]];then
     project_config_path=${config_path}${project}
     project_path=${JENKINS_HOME}/workspace/${JOB_NAME}
-    project_backup_path=${JENKINS_HOME}/code_backup/${JOB_NAME}
+    project_backup_path=${JENKINS_HOME}/backup/code/${JOB_NAME}
     remote_tomcat_project_path=${remote_tomcat_path}"tomcat-"${project}/webapps/ROOT/
     service_name=${project}
     package_name=${project}"."${package_suffix}
@@ -37,7 +37,7 @@ if [[ ${CHOICE_SUBITEM} == "" ]];then
 else 
     project_config_path=${config_path}${project}/${CHOICE_SUBITEM}
     project_path=${JENKINS_HOME}/workspace/${JOB_NAME}/${CHOICE_SUBITEM}
-    project_backup_path=${JENKINS_HOME}/code_backup/${JOB_NAME}/${CHOICE_SUBITEM}
+    project_backup_path=${JENKINS_HOME}/backup/code/${JOB_NAME}/${CHOICE_SUBITEM}
     if [[ ${CHOICE_SUBITEM} == "hr-wx" ]];then
         remote_tomcat_project_path=${remote_tomcat_path}"tomcat-"${CHOICE_SUBITEM}/webapps/${CHOICE_SUBITEM}/
     else
@@ -54,6 +54,9 @@ if [[ ! -z ${ROLLBACK_VERSION} ]];then
     rollback_path=${project_backup_path}/${rollback_version}
 fi
 backup_path=${project_backup_path}/${BUILD_NUMBER}/
+if [[ ${backup} == "yes" ]];then
+    ln -s ${project_backup_path} ${project_path}/backup
+fi
 # 项目路径
 cd ${project_path}
 if [[ $? -ne 0 ]];then

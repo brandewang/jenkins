@@ -1,17 +1,19 @@
 #!/bin/bash
 harbor_domain="k8s-harbor.test.fruitday.com"
 harbor_repo="fruitday"
-k8s_path="/data/kubernetes/"
+k8s_project_path=${project_path}"/k8s/"
+k8s_project_backup_path=${JENKINS_HOME}/backup/k8s/${JOB_NAME}
+k8s_backup_path=${k8s_project_backup_path}/${BUILD_NUMBER}/
 namespace=$(echo ${JOB_NAME} | awk -F '/' '{print $1}')
 
-if [[ ${CHOICE_SUBITEM} == "" ]];then
-    k8s_project_path=${k8s_path}${namespace}/${project}
-else
-    k8s_project_path=${k8s_path}${namespace}/${project}/${CHOICE_SUBITEM}
-fi
+rollback_path=${k8s_project_backup_path}/${rollback_version}
 
-if [[ ! -d ${k8s_project_path} ]];then
-     mkdir -p ${k8s_project_path}
+ln -s ${k8s_project_backup_path} ${project_path}/backup
+echo k8s_project_path ${k8s_project_path}
+mkdir -p ${k8s_project_path}
+
+if [[ ! -d ${k8s_backup_path} ]];then
+     mkdir -p ${k8s_backup_path}
 fi
 
 if [[ -z ${NUM} ]];then

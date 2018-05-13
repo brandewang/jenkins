@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {APPNAME}
+  namespace: {NAMESPACE}
+spec:
+  rules:
+  - host: {APPNAME}.test.fruitday.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {APPNAME}
+          servicePort: 8080

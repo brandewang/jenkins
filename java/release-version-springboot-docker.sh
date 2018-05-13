@@ -1,12 +1,11 @@
 #!/bin/bash
 set -x
-echo '------------------'
+echo '========================='
 env 
-echo '------------------'
+echo '========================='
 # 发布代码
 source ${JENKINS_JAVA_SHELL_PATH}/common.sh
 source ${JENKINS_JAVA_SHELL_PATH}/k8s-common.sh
-
 function check_package_springboot {
     cd ${project_path}
     package=$(find . -name ${package_name})
@@ -28,7 +27,7 @@ function check_image {
 }
 
 function build_image {
-    cp ${JENKINS_JAVA_SHELL_PATH}/Dockerfile ${project_path}/
+    cp ${JENKINS_JAVA_SHELL_PATH}dockerfiles/${CONTAINER_TYPE} ${project_path}/Dockerfile
     docker build --build-arg path=${src_package} -t ${image_name} .
     docker push ${image_name} 
 }
@@ -40,8 +39,15 @@ function check_namespace {
     fi
 }
 
+function k8s_conf_backup {
+    cp -r ${k8s_project_path}/* ${k8s_backup_path}
+    #if [[ $? -ne 0 ]];then
+    #    /usr/local/bin/kubectl create namespace ${namespace}
+    #fi
+}
+
 function replace_k8s_yaml {
-    cp ${k8s_path}/demo/java-* ${k8s_project_path}/
+    cp ${JENKINS_JAVA_SHELL_PATH}k8s/demo/${CONTAINER_TYPE}-* ${k8s_project_path}/
     cd ${k8s_project_path}
     files=$(ls)
     ((limits_mem=512*2))
@@ -82,14 +88,13 @@ if [[ ${to_rollback} == "" ]];then
     check_image
     check_namespace 
     replace_k8s_yaml
+    k8s_conf_backup
     apply_yaml
 else
     desc="rollback to "${rollback_version}
     replace_k8s_yaml
     apply_yaml
 fi
-
-
 
 # jenkins打标签
 curl -n -X POST -d "description=${desc}" "${BUILD_URL}/submitDescription"
