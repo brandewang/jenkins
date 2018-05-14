@@ -1,4 +1,5 @@
-#!/bin/bash # 公共资源
+#!/bin/bash
+# 公共资源
 if [[ ${JOB_NAME} =~ ^pro- ]];then
     user="ec2-user"
     hosts_file=${JENKINS_HOME}/ansible/hosts

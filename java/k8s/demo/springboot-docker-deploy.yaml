@@ -63,3 +63,7 @@ spec:
         env:
         - name: env
           value: "test"
+        - name: XMS
+          value: "{REQUESTS_MEM}"
+        - name: XMX
+          value: "{XMX_MEM}"

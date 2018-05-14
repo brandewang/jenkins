@@ -24,3 +24,7 @@ if [[ -z ${CPU} ]];then
     requests_cpu=300
     limits_cpu=4000
 fi
+
+((limits_mem=${usage_mem}*2))
+((xmx_mem=${usage_mem}+128))
+

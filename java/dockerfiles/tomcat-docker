@@ -1,0 +1,11 @@
+FROM k8s-harbor.test.fruitday.com/base/tomcat:v1
+
+MAINTAINER nijq@fruitday.com
+
+ARG config_path
+ARG path
+
+COPY ${config_path} /tmp/pg/
+COPY ${path} ${TOMCAT_HOME}/webapps/ROOT/
+
+CMD ${TOMCAT_HOME}/bin/catalina.sh run
