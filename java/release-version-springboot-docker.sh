@@ -28,4 +28,3 @@ else
 fi
 
 push_jenkins_desc
-#curl -n -X POST -d "description=${desc}" "${BUILD_URL}/submitDescription"

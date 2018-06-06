@@ -2,6 +2,7 @@
 set -x
 # 发布代码
 source ${JENKINS_JAVA_SHELL_PATH}/common.sh
+source ${JENKINS_JAVA_SHELL_PATH}/common-function.sh
 
 shell_name='get-springboot-http-port.sh'
 remote_path=${remote_java_logs}
@@ -15,17 +16,6 @@ fi
 #else
 #    touch ${lock_file}
 #fi
-
-function check_package_springboot {
-    cd ${project_path}
-    package=$(find . -name ${package_name})
-    package_num=$(echo ${package} |wc -l)
-    if [[ ${package_num} -ne 1 ]];then
-        echo "package num is error! ${package}"
-#        rm ${lock_file}
-        exit 1
-    fi
-}
 
 function project_backup {
     if [[ ${backup} == "yes" ]];then
@@ -75,9 +65,6 @@ else
     src_package=${rollback_path}
 fi
 
-# jenkins打标签
-curl -n -X POST -d "description=${desc}" "${BUILD_URL}/submitDescription"
-
 for remote_ip in ${remote_ips}
 do
     restart_service
@@ -91,3 +78,4 @@ if [[ ${to_rollback} != "" ]];then
 fi
 #rm ${lock_file}
 
+push_jenkins_desc

@@ -5,7 +5,7 @@ MAINTAINER nijq@fruitday.com
 ARG config_path
 ARG path
 
-COPY ${config_path} /tmp/pg/
+COPY ${config_path} /tmp/config/
 COPY ${path} ${TOMCAT_HOME}/webapps/ROOT/
 
-CMD ${TOMCAT_HOME}/bin/catalina.sh run
+CMD /etc/init.d/app

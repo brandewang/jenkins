@@ -5,7 +5,7 @@ if [[ ${JOB_NAME} =~ ^pro- ]];then
     hosts_file=${JENKINS_HOME}/ansible/hosts
 else
     user="www"
-    hosts_file=${JENKINS_HOME}/ansible/pg-hsts
+    hosts_file=${JENKINS_HOME}/ansible/pg-hosts
 fi
 
 hosts='static'

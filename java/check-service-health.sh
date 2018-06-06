@@ -13,7 +13,7 @@ function check_port_status(){
 
 function check_service_status(){
     url=${scheme}${remote_ip}":"${http_port}${check_uri}
-    http_code=$(curl -I --connect-timeout ${check_time} -m ${check_time} -o /dev/null -s -w %{http_code} "${url}")
+    http_code=$(curl -I --connect-timeout ${conn_time} -m ${max_time} -o /dev/null -s -w %{http_code} "${url}")
     if [[ $? -ne 0 || ${http_code} == "404" ]];then
         service_status="error" 
     else
@@ -22,7 +22,8 @@ function check_service_status(){
 }
 
 # 获取启动端口
-http_port=$(ssh ${user}@${remote_ip} "bash ${remote_shell_path}${shell_name} ${service_name} ${remote_path}")
+#http_port=$(ssh ${user}@${remote_ip} "bash ${remote_shell_path}${shell_name} ${service_name} ${remote_path}")
+http_port=$(/usr/bin/python /home/www/jenkins/ansible/app_getinfo.py ${service_name} get_port)
 if [[ -z ${http_port} ]];then
     echo "端口未获取到，请联系管理员！"
     service_status="error"

@@ -1,14 +1,16 @@
 #!/bin/bash
 # 公共资源
+pro_config_path=${JENKINS_HOME}/workspace/ops-common/pro-config/
+pg_config_path=${JENKINS_HOME}/workspace/ops-common/pg-config/
 if [[ ${JOB_NAME} =~ ^pro- ]];then
     user="ec2-user"
     hosts_file=${JENKINS_HOME}/ansible/hosts
-    config_path=${JENKINS_HOME}/workspace/ops-common/pro-config/
+    config_path=${pro_config_path}
     backup='yes'
 else
     user="www"
     hosts_file=${JENKINS_HOME}/ansible/pg-hosts
-    config_path=${JENKINS_HOME}/workspace/ops-common/pg-config/
+    config_path=${pg_config_path}
     backup='no'
 fi
 remote_shell_path="/home/www/publish-shell/"
@@ -25,7 +27,7 @@ if [[ -z ${PACKAGE_SUFFIX} ]];then
 else
     package_suffix=${PACKAGE_SUFFIX}
 fi
-# 配置文件目录
+# 配置文件目录，其中pro_xx与pg_xx后期会去除，暂时先给k8s使用
 if [[ ${CHOICE_SUBITEM} == "" ]];then
     project_config_path=${config_path}${project}
     project_path=${JENKINS_HOME}/workspace/${JOB_NAME}
@@ -73,7 +75,8 @@ if [[ -z ${CHECK_URI} ]];then
 else
     check_uri=${CHECK_URI}
 fi
-check_time=120
+conn_time=10
+max_time=60
 
 # springboot 项目
 if [[ -z ${USAGE_MEM} ]];then

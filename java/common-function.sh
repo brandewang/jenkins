@@ -19,6 +19,13 @@ function check_package_springboot {
     fi
 }
 
+function cp_libsap {
+    # libsapjco3.so 用途为调用SAP，部分项目会使用
+    if [[ ${LIBSAP} == "true" ]];then
+        cp ${JENKINS_JAVA_SHELL_PATH}/so/libsapjco3.so ${package}/WEB-INF/lib/
+    fi
+}
+
 # jenkins打标签
 function push_jenkins_desc {
     curl -n -X POST -d "description=${desc}" "${BUILD_URL}/submitDescription"

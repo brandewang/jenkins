@@ -2,6 +2,7 @@
 # 发布代码
 set -x
 source ${JENKINS_JAVA_SHELL_PATH}/common.sh
+source ${JENKINS_JAVA_SHELL_PATH}/common-function.sh
 
 shell_name='get-tomcat-http-port.sh'
 remote_path=${remote_tomcat_path}
@@ -16,24 +17,6 @@ fi
 #    touch ${lock_file}
 #fi
 
-function check_package_tomcat {
-    cd ${project_path}
-    package=$(find . -name *.war | awk -F '.war' '{print $1}')
-    package_num=$(echo ${package} |wc -l)
-    if [[ ${package_num} -ne 1 ]];then
-        echo "package num is error! ${package}"
-#        rm ${lock_file}
-        exit 1
-    fi
-}
-
-function cp_libsap {
-    # libsapjco3.so 用途为调用SAP，部分项目会使用
-    if [[ ${LIBSAP} == "true" ]];then
-        cp ${JENKINS_JAVA_SHELL_PATH}/so/libsapjco3.so ${package}/WEB-INF/lib/
-    fi
-}
-
 function project_backup {
     if [[ ${backup} == "yes" ]];then
         mkdir -p ${backup_path}
@@ -44,6 +27,7 @@ function project_backup {
 function restart_service {
     ssh ${user}@${remote_ip} "bash ${remote_shell_path}"shutdown-tomcat.sh" ${service_name}"
     rsync -a ${src_package}/* ${user}@${remote_ip}:${remote_tomcat_project_path} --delete-after
+    sleep 10
     ssh ${user}@${remote_ip} "bash ${remote_shell_path}"startup-tomcat.sh" ${service_name} ${remote_path}"
     if [[ ${service_status} == "" && ${to_rollback} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
@@ -83,9 +67,6 @@ else
     src_package=${rollback_path}
 fi
 
-# jenkins打标签
-curl -n -X POST -d "description=${desc}" "${BUILD_URL}/submitDescription"
-
 for remote_ip in ${remote_ips}
 do
     restart_service
@@ -98,3 +79,5 @@ if [[ ${to_rollback} != "" ]];then
     exit 1
 fi
 #rm ${lock_file}
+
+push_jenkins_desc
