@@ -2,7 +2,7 @@
 tmp_file='/tmp/check_list'
 result='/tmp/all_service_check.log'
 date > $result
-python app_getinfo.py gen_check_list > $tmp_file
+python /home/www/jenkins/scripts/ansible/app_getinfo.py gen_check_list > $tmp_file
 
 function check_service_status {
     if [[ ${se_which} == "auth" ||  ${se_which} == "sap-data" ]];then
@@ -30,7 +30,7 @@ do
     type=${line[2]}
     port=${line[3]}
     check_url=${line[4]}
-    ips=`python app_getinfo.py $se_which get_ip`
+    ips=`python /home/www/jenkins/scripts/ansible/app_getinfo.py $se_which get_ip`
     if [[ ${ips} =~ "192.168" ]];then
         lenth=`echo $ips|awk '{print NF}'`
         if [[ $lenth -gt 1 ]];then
@@ -44,4 +44,6 @@ do
         fi
     fi
 done < $tmp_file
-
+echo '-------------------------------------------'
+cat $result
+echo '-------------------------------------------'

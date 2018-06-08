@@ -25,10 +25,12 @@ function project_backup {
 }
 
 function restart_service {
+    echo ${CONTAINER_TYPE}
     ssh ${user}@${remote_ip} "bash ${remote_shell_path}"shutdown-tomcat.sh" ${service_name}"
     rsync -a ${src_package}/* ${user}@${remote_ip}:${remote_tomcat_project_path} --delete-after
     sleep 10
-    ssh ${user}@${remote_ip} "bash ${remote_shell_path}"startup-tomcat.sh" ${service_name} ${remote_path}"
+    #ssh ${user}@${remote_ip} "bash ${remote_shell_path}"startup-tomcat.sh" ${service_name} ${remote_path}"
+    ssh ${user}@${remote_ip} "bash ${remote_shell_path}"startup-tomcat.sh" ${service_name}" 
     if [[ ${service_status} == "" && ${to_rollback} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
         if [[ ${service_status} == "error" ]];then

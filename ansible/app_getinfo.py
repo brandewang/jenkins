@@ -14,6 +14,8 @@ def main(app, todo, app_dicts):
             result = app_dicts[app].get('port', 'null')
         elif todo == 'get_type':
             result = app_dicts[app].get('type', 'null')
+        elif todo == 'get_mem':
+            result = app_dicts[app].get('mem', '')
         elif todo == 'get_ip':
             result = ' '.join(app_dicts[app].get('ip', ['null']))
         else:
@@ -33,7 +35,7 @@ def gen_check_list(app_dicts):
                 uri=value['uri']
             else:
                 uri='/index.jsp'
-            print key,key,type,value['port'],uri
+            print key,key,type,value['port'],uri,value.get('mem', '')
 
 
 if __name__=="__main__":

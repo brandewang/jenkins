@@ -451,3 +451,7 @@ check=1
 [brande-t:vars]
 type=tomcat
 port=8888
+[brande-s:vars]
+type=springboot
+port=9999
+mem=562

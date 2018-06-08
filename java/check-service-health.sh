@@ -23,7 +23,11 @@ function check_service_status(){
 
 # 获取启动端口
 #http_port=$(ssh ${user}@${remote_ip} "bash ${remote_shell_path}${shell_name} ${service_name} ${remote_path}")
-http_port=$(/usr/bin/python /home/www/jenkins/ansible/app_getinfo.py ${service_name} get_port)
+if [[ ${JOB_NAME} =~ ^pro- ]];then
+    http_port=$(/usr/bin/python /home/www/jenkins/ansible/app_getinfo.py ${service_name} get_port)
+else
+    http_port=$(ssh ${user}@${remote_ip} "bash ${remote_shell_path}${shell_name} ${service_name} ${remote_path}")
+fi
 if [[ -z ${http_port} ]];then
     echo "端口未获取到，请联系管理员！"
     service_status="error"
