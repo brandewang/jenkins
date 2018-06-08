@@ -90,7 +90,7 @@ else
     fi
 fi
 
-mem=`python /home/www/jenkins/scripts/ansible/app_getinfo.py $project get_mem`
+mem=`python /home/www/jenkins/scripts/ansible/app_getinfo.py $service_name get_mem`
 if [[ ! -z $mem ]];then
     usage_mem=$mem
 fi

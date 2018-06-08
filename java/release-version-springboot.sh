@@ -26,9 +26,11 @@ function project_backup {
 
 function restart_service {
     echo ${CONTAINER_TYPE}
-    ssh ${user}@${remote_ip} "bash ${remote_shell_path}"shutdown-springboot.sh" ${service_name}"
+    ssh ${user}@${remote_ip} "bash ${remote_shell_path}service-control.sh stop ${service_name} springboot"
     rsync -a ${src_package} ${user}@${remote_ip}:${remote_springboot_project_path}
-    ssh ${user}@${remote_ip} "bash /etc/init.d/springboot restart ${service_name} ${usage_mem}"
+    ssh ${user}@${remote_ip} "bash ${remote_shell_path}service-control.sh restart ${service_name} springboot ${usage_mem}"
+    sleep 10
+    #ssh ${user}@${remote_ip} "bash /etc/init.d/springboot restart ${service_name} ${usage_mem}"
     if [[ ${service_status} == "" && ${to_rollback} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
         if [[ ${service_status} == "error" ]];then

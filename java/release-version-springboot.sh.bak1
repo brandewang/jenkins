@@ -1,11 +1,11 @@
 #!/bin/bash
-# 发布代码
 set -x
+# 发布代码
 source ${JENKINS_JAVA_SHELL_PATH}/common.sh
 source ${JENKINS_JAVA_SHELL_PATH}/common-function.sh
 
-shell_name='get-tomcat-http-port.sh'
-remote_path=${remote_tomcat_path}
+shell_name='get-springboot-http-port.sh'
+remote_path=${remote_java_logs}
 if [[ ! -z $2 ]];then
     remote_ips=$2
 fi
@@ -20,17 +20,15 @@ fi
 function project_backup {
     if [[ ${backup} == "yes" ]];then
         mkdir -p ${backup_path}
-        rsync -a ${package}/* ${backup_path}
+        rsync -a ${package} ${backup_path}
     fi
 }
 
 function restart_service {
     echo ${CONTAINER_TYPE}
-    ssh ${user}@${remote_ip} "bash ${remote_shell_path}"service-control.sh" stop ${service_name} tomcat"
-    rsync -a ${src_package}/* ${user}@${remote_ip}:${remote_tomcat_project_path} --delete-after
-    #ssh ${user}@${remote_ip} "bash ${remote_shell_path}"startup-tomcat.sh" ${service_name} ${remote_path}"
-    ssh ${user}@${remote_ip} "bash ${remote_shell_path}"service-control.sh" restart ${service_name} tomcat" 
-    sleep 10
+    ssh ${user}@${remote_ip} "bash ${remote_shell_path}"shutdown-springboot.sh" ${service_name}"
+    rsync -a ${src_package} ${user}@${remote_ip}:${remote_springboot_project_path}
+    ssh ${user}@${remote_ip} "bash /etc/init.d/springboot restart ${service_name} ${usage_mem}"
     if [[ ${service_status} == "" && ${to_rollback} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
         if [[ ${service_status} == "error" ]];then
@@ -40,7 +38,7 @@ function restart_service {
                     rm -rf ${backup_path}
                 fi
                 # 默认恢复至上一个正确的版本（ROLLBACK_VERSION）
-                source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "tomcat" "${remote_ip}"
+                source ${JENKINS_JAVA_SHELL_PATH}/rollback.sh "springboot" "${remote_ip}"
                 echo 本次版本发布异常，已回退至版本: ${rollback_version}
                 exit 1
             else
@@ -55,13 +53,12 @@ function restart_service {
 if [[ ${to_rollback} == "" ]];then
     desc=${GIT_COMMIT}
     # 检测本次编译后，是否有超出预期效果的情况
-    check_package_tomcat
+    check_package_springboot
     src_package=${package}
     if [[ -z ${src_package} ]];then
         echo "src_package not found!";
         exit 1
     fi
-    cp_libsap
     # 归档代码
     project_backup
 else

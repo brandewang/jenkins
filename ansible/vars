@@ -17,11 +17,11 @@ type=springboot
 port=11001
 check=1
 [api.router:vars]
-type=tomcat
+type=springboot
 port=20013
 check=1
 [api.setting:vars]
-type=tomcat
+type=springboot
 port=20031
 check=1
 [api-srv:vars]
