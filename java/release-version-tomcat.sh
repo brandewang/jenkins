@@ -30,7 +30,7 @@ function restart_service {
     rsync -a ${src_package}/* ${user}@${remote_ip}:${remote_tomcat_project_path} --delete-after
     #ssh ${user}@${remote_ip} "bash ${remote_shell_path}"startup-tomcat.sh" ${service_name} ${remote_path}"
     ssh ${user}@${remote_ip} "bash ${remote_shell_path}"service-control.sh" restart ${service_name} tomcat" 
-    sleep 10
+    sleep 5
     if [[ ${service_status} == "" && ${to_rollback} == "" ]];then
         source ${JENKINS_JAVA_SHELL_PATH}/check-service-health.sh
         if [[ ${service_status} == "error" ]];then

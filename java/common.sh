@@ -91,8 +91,12 @@ else
 fi
 
 mem=`python /home/www/jenkins/scripts/ansible/app_getinfo.py $service_name get_mem`
-if [[ ! -z $mem ]];then
+if [[ $mem =~ 'error' ]];then
+    echo "内存信息获取失败"
+elif [[ ! -z $mem ]];then
     usage_mem=$mem
+else
+    echo '内存信息获取失败'
 fi
 
 
